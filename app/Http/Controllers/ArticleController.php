@@ -43,10 +43,12 @@ class ArticleController extends Controller
                     $query->where('name', $tag);
                 });
             })->get();
+        }else{
+            $articles = Article::all();
         }
 
 
-        $articles = Article::all();
+
 
         return view('articles.index', compact('articles','topUsers','mostCommentedArticles','totalArticlesPerUser'));
     }
