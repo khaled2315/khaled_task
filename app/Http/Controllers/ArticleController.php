@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class ArticleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         //top 5 users with the most articles
         $topUsers = DB::table('users')
@@ -35,6 +35,17 @@ class ArticleController extends Controller
                                 ->groupBy('users.id', 'users.name')
                                 ->orderBy('total_articles', 'DESC')
                                 ->get();
+        //for filter if available
+        $tag = $request->query('tag');
+        if(!empty($tag)){
+            $articles = Article::when($tag, function ($query) use ($tag) {
+                $query->whereHas('tags', function ($query) use ($tag) {
+                    $query->where('name', $tag);
+                });
+            })->get();
+        }
+
+
         $articles = Article::all();
 
         return view('articles.index', compact('articles','topUsers','mostCommentedArticles','totalArticlesPerUser'));
